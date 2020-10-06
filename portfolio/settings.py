@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
 from pathlib import Path
+from decouple import config
+import dj_database_url
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,12 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ')_!qe3!05s=4x^^r%6527dh$r-^fqh1wnws$t!l9uex+v+hg%#'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*'] 
 
 
 # Application definition
@@ -74,17 +76,28 @@ WSGI_APPLICATION = 'portfolio.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
+if DEBUG:
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        #'NAME': BASE_DIR / 'db.sqlite3',
-        'NAME': 'spiderdb',
-        'USER': 'postgres',
-        'PASSWORD': 'super',
-        'PORT': '5432'
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            #'NAME': BASE_DIR / 'db.sqlite3',
+            'NAME': 'spiderdb',
+            'USER': 'postgres',
+            'PASSWORD': 'super',
+            'PORT': '5432'
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            **dj_database_url.parse(config("DATABASE_URL"))
+            }
+    }
+
+
 
 
 # Password validation
@@ -128,3 +141,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static')
+)
